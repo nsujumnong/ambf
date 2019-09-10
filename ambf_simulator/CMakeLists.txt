@@ -43,6 +43,9 @@
 find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
+find_package(OpenCV REQUIRED)
+
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable (ambf_simulator src/ambf_simulator.cpp)
-target_link_libraries (ambf_simulator ${AMBF_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries (ambf_simulator ${AMBF_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBRARIES})

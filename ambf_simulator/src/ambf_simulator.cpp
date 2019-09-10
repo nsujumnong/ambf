@@ -50,6 +50,10 @@
 #include <GLFW/glfw3.h>
 #include <boost/program_options.hpp>
 #include <mutex>
+#include <ros/ros.h>
+#include <image_transport/image_transport.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <cv_bridge/cv_bridge.h>
 //---------------------------------------------------------------------------
 using namespace ambf;
 using namespace chai3d;
@@ -87,6 +91,15 @@ cBulletWorld* g_bulletWorld;
 
 afMultiBody *g_afMultiBody;
 afWorld *g_afWorld;
+
+//---------------------------------------------------------------------------
+// OpenCV-ROS image publishing
+//---------------------------------------------------------------------------
+// generate image for publishing ROS
+cImagePtr image = cImage::create();
+cv::Mat immatrix;
+
+//---------------------------------------------------------------------------
 
 struct CommandLineOptions{
     bool useFixedPhxTimeStep = 0;
@@ -243,6 +256,14 @@ int main(int argc, char* argv[])
     // INITIALIZATION
     //-----------------------------------------------------------------------
     namespace p_opt = boost::program_options;
+    ros::init(argc, argv, "image_publisher");
+
+    // ROS node handler
+    ros::NodeHandle nh;
+    image_transport::ImageTransport it(nh);
+    image_transport::Publisher pub = it.advertise("camera/image",1);
+
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
 
     p_opt::options_description cmd_opts("InputDevices Application Usage");
     cmd_opts.add_options()
@@ -1168,6 +1189,9 @@ void updateGraphics()
         if (glfwWindowShouldClose(cameraPtr->m_window)){
             g_window_closed = true;
         }
+
+        immatrix = cv::Mat(image->getHeight(), image->getWidth(), CV_8UC4, image->getData());
+        cv::waitKey(30);
 
 //        // wait until all GL commands are completed
 //        glFinish();

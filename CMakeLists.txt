@@ -99,7 +99,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 # ROS Dependency
 if (${CMAKE_SYSTEM_NAME} MATCHES Linux)
-    find_package(catkin COMPONENTS
+    find_package(catkin REQUIRED COMPONENTS
       roscpp
     )
     if (${catkin_FOUND})
@@ -107,7 +107,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES Linux)
         add_subdirectory(${PROJECT_SOURCE_DIR}/ambf_ros_modules)
         # Call find catkin again, with REQUIRED this time, it's okay to write over previously
         # imported catkin variables
-        find_package(catkin REQUIRED COMPONENTS ambf_comm ambf_msgs dvrk_arm)
+        find_package(catkin REQUIRED COMPONENTS ambf_comm ambf_msgs dvrk_arm cv_bridge image_transport)
         add_definitions(-DC_ENABLE_AMBF_COMM_SUPPORT)
         add_definitions(-DC_ENABLE_AMBF_DVRK_SUPPORT)
         set (CHAI3D_DEFINITIONS -DC_ENABLE_AMBF_COMM_SUPPORT)
