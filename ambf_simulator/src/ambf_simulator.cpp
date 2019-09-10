@@ -96,6 +96,7 @@ afWorld *g_afWorld;
 // OpenCV-ROS image publishing
 //---------------------------------------------------------------------------
 // generate image for publishing ROS
+cFrameBuffer* g_frameBuffer = new cFrameBuffer();
 cImagePtr image = cImage::create();
 cv::Mat immatrix;
 
@@ -563,6 +564,14 @@ int main(int argc, char* argv[])
     for (g_cameraIt = g_cameras.begin(); g_cameraIt != g_cameras.end() ; ++ g_cameraIt){
         windowSizeCallback((*g_cameraIt)->m_window, (*g_cameraIt)->m_width, (*g_cameraIt)->m_height);
     }
+
+    afCameraPtr _afCam;
+    // close window
+    for (g_cameraIt = g_cameras.begin(); g_cameraIt !=  g_cameras.end() ; ++ g_cameraIt){
+        _afCam = (*g_cameraIt);
+    }
+
+    g_frameBuffer->setup(_afCam->getCamera(), _afCam->m_width, _afCam->m_height, true, true);
 
     // main graphic loop
     while (!g_window_closed)
@@ -1196,8 +1205,16 @@ void updateGraphics()
             g_window_closed = true;
         }
 
-        immatrix = cv::Mat(image->getHeight(), image->getWidth(), CV_8UC4,image->getData());
+        //frame_buffer->renderView();
+        //frame_buffer->copyImageBuffer(image);
+        g_frameBuffer->renderView();
+        g_frameBuffer->copyImageBuffer(image);
+        image->flipHorizontal();
+        immatrix = cv::Mat(image->getHeight(), image->getWidth(), CV_8UC4, image->getData());
 
+//        std::cout << "M = " << std::endl << " " << immatrix << std::endl << std::endl;
+
+        cv::cvtColor(immatrix, immatrix, cv::COLOR_BGRA2RGB);
 //        // wait until all GL commands are completed
 //        glFinish();
 
